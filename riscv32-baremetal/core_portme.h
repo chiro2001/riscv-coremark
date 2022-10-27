@@ -69,11 +69,12 @@ typedef clock_t CORE_TICKS;
 #else
 
 #include <stddef.h>
+#include <stdint.h>
 
 /* Configuration: size_t and clock_t
      Note these need to match the size of the clock output and the xLen the processor supports
  */
-typedef unsigned int size_t;
+// typedef uint32_t size_t;
 typedef unsigned long int clock_t;
 typedef clock_t CORE_TICKS;
 #endif
@@ -102,13 +103,13 @@ typedef clock_t CORE_TICKS;
 	*Imprtant*:
 	ee_ptr_int needs to be the data type used to hold pointers, otherwise coremark may fail!!!
 */
-typedef signed short ee_s16;
-typedef unsigned short ee_u16;
-typedef signed int ee_s32;
+typedef int16_t ee_s16;
+typedef uint16_t ee_u16;
+typedef int32_t ee_s32;
 typedef double ee_f32;
-typedef unsigned char ee_u8;
-typedef unsigned int ee_u32;
-typedef unsigned long long ee_ptr_int;
+typedef uint8_t ee_u8;
+typedef uint32_t ee_u32;
+typedef size_t ee_ptr_int;
 typedef size_t ee_size_t;
 /* align an offset to point to a 32b value */
 #define align_mem(x) (void *)(4 + (((ee_ptr_int)(x) - 1) & ~3))
@@ -222,6 +223,8 @@ typedef size_t ee_size_t;
 #ifndef MAIN_HAS_NORETURN
 #define MAIN_HAS_NORETURN 0
 #endif
+
+#define PRINT_ARGS 1
 
 /* Variable: default_num_contexts
 	Number of contexts to spawn in multicore context.
