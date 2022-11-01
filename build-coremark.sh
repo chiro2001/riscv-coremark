@@ -23,7 +23,7 @@ riscv32-unknown-elf-objcopy -O binary coremark.bare.riscv coremark.bare.bin
 
 make PORT_DIR=../riscv32-bootrom compile
 riscv32-unknown-elf-objcopy -O binary coremark.bootrom.riscv coremark.bootrom.bin
-riscv32-unknown-elf-objdump -D coremark.bootrom.riscv > coremark.boortom.dump
+riscv32-unknown-elf-objdump -D coremark.bootrom.riscv > coremark.bootrom.dump
 
 mv *.riscv* ../
 mv *.bin* ../
