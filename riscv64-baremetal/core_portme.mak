@@ -18,16 +18,18 @@
 
 # Flag: RISCVTOOLS
 #	Use this flag to point to your RISCV tools
-RISCVTOOLS=$(RISCV)
+# RISCVTOOLS=$(RISCV)
 # Flag: RISCVTYPE
 #   Type of toolchain to use
-RISCVTYPE=riscv64-unknown-elf
+# RISCVTYPE=riscv64-unknown-elf
 # Flag: OUTFLAG
 #	Use this flag to define how to to get an executable (e.g -o)
 OUTFLAG= -o
 # Flag: CC
 #	Use this flag to define compiler to use
-CC = $(RISCVTOOLS)/bin/$(RISCVTYPE)-gcc
+# CC = $(RISCVTOOLS)/bin/$(RISCVTYPE)-gcc
+CROSS_COMPILE := riscv64-unknown-elf
+CC = $(CROSS_COMPILE)-gcc
 # Flag: CFLAGS
 #	Use this flag to define compiler options. Note, you can add compiler options from the command line using XCFLAGS="other flags"
 #PORT_CFLAGS = -O2 -static -std=gnu99
@@ -68,7 +70,7 @@ EXE = .bare.riscv64
 # In this case, you also need to define below how to create an object file, and how to link.
 ifdef SEPARATE_COMPILE
 
-LD		= $(RISCVTOOLS)/bin/$(RISCVTYPE)-gcc
+LD = $(CROSS_COMPILE)-gcc
 OBJOUT 	= -o
 LFLAGS 	=
 OFLAG 	= -o

@@ -72,7 +72,7 @@ EXE = .bootrom.riscv
 # In this case, you also need to define below how to create an object file, and how to link.
 ifdef SEPARATE_COMPILE
 
-LD		= $(RISCVTOOLS)/bin/$(RISCVTYPE)-gcc
+LD = $(CROSS_COMPILE)-gcc
 OBJOUT 	= -o
 LFLAGS 	=
 OFLAG 	= -o
