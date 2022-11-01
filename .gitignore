@@ -1,2 +1,3 @@
-coremark.riscv
-coremark.bare.riscv
+coremark*riscv*
+coremark*bin*
+coremark*dump*

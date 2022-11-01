@@ -21,13 +21,13 @@
 RISCVTOOLS=$(RISCV)
 # Flag: RISCVTYPE
 #   Type of toolchain to use
-RISCVTYPE=riscv64-unknown-elf
+RISCVTYPE=riscv32-unknown-elf
 # Flag: OUTFLAG
 #	Use this flag to define how to to get an executable (e.g -o)
 OUTFLAG= -o
 # Flag: CC
 #	Use this flag to define compiler to use
-CC = $(RISCVTOOLS)/bin/$(RISCVTYPE)-gcc
+CC = $(RISCVTYPE)-gcc
 # Flag: CFLAGS
 #	Use this flag to define compiler options. Note, you can add compiler options from the command line using XCFLAGS="other flags"
 #PORT_CFLAGS = -O2 -static -std=gnu99

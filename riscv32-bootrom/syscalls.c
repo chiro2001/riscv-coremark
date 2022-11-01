@@ -123,6 +123,8 @@ void _init(int cid, int nc)
   exit(ret);
 }
 
+#define UART_PORT 0x54000000
+
 #undef putchar
 int putchar(int ch)
 {
@@ -134,6 +136,7 @@ int putchar(int ch)
   if (ch == '\n' || buflen == sizeof(buf))
   {
     syscall(SYS_write, 1, (uintptr_t)buf, buflen);
+    *((uint8_t*)(UART_PORT)) = *buf;
     buflen = 0;
   }
 

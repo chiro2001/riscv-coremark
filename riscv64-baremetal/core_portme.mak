@@ -61,7 +61,7 @@ LOAD = echo Loading done
 RUN = spike pk
 
 OEXT = .o
-EXE = .bare.riscv
+EXE = .bare.riscv64
 
 # Flag: SEPARATE_COMPILE
 # Define if you need to separate compilation from link stage.
