@@ -15,6 +15,20 @@
   .section ".text.init"
   .globl _start
 _start:
+  # lui a0,0x54000000>>12
+	# addi a1,zero,'S'
+	# addi a2,zero,'T'
+	# addi a3,zero,'A'
+	# addi a4,zero,'R'
+	# addi a5,zero,'T'
+	# addi a6,zero,'\n'
+  # sw a1,0(a0)
+	# sw a2,0(a0)
+	# sw a3,0(a0)
+	# sw a4,0(a0)
+	# sw a5,0(a0)
+	# sw a6,0(a0)
+  # j _start
   li  x1, 0
   li  x2, 0
   li  x3, 0
@@ -126,7 +140,9 @@ _start:
 1:bgeu a0, a1, 1b
 
   # give each core 128KB of stack + TLS
-#define STKSHIFT 17
+// #define STKSHIFT 17
+  # give each core 64KB of stack + TLS
+#define STKSHIFT 18
   sll a2, a0, STKSHIFT
   add tp, tp, a2
   add sp, a0, 1

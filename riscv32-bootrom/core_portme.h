@@ -237,6 +237,8 @@ typedef size_t ee_size_t;
 */
 extern ee_u32 default_num_contexts;
 
+// #define CORE_DEBUG 1
+
 #if (MULTITHREAD>1)
 #if USE_PTHREAD
 	#include <pthread.h>
