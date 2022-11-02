@@ -190,12 +190,12 @@ ee_u32 default_num_contexts=MULTITHREAD;
 */
 void portable_init(core_portable *p, int *argc, char *argv[])
 {
-#if PRINT_ARGS
-	int i;
-	for (i=0; i<*argc; i++) {
-		ee_printf("Arg[%d]=%s\n",i,argv[i]);
-	}
-#endif
+// #if PRINT_ARGS
+// 	int i;
+// 	for (i=0; i<*argc; i++) {
+// 		ee_printf("Arg[%d]=%s\n",i,argv[i]);
+// 	}
+// #endif
 	if (sizeof(ee_ptr_int) != sizeof(ee_u8 *)) {
 		ee_printf("ERROR! Please define ee_ptr_int to a type that holds a pointer!\n");
 	}

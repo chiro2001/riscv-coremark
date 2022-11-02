@@ -210,7 +210,7 @@ typedef size_t ee_size_t;
 	1 - argc/argv to main is not supported
 */
 #ifndef MAIN_HAS_NOARGC
-#define MAIN_HAS_NOARGC 1
+#define MAIN_HAS_NOARGC 0
 #endif
 
 /* Configuration: MAIN_HAS_NORETURN

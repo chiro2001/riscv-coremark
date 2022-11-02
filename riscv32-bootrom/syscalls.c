@@ -90,7 +90,7 @@ void exit(int code) { tohost_exit(code); }
 
 void abort() { exit(128 + SIGABRT); }
 
-void printstr(const char* s) { syscall(SYS_write, 1, (uintptr_t)s, strlen(s)); }
+void printstr(char* s) { syscall(SYS_write, 1, (uintptr_t)s, strlen(s)); }
 
 void __attribute__((weak)) thread_entry(int cid, int nc) {
   // multi-threaded programs override this function.
@@ -448,21 +448,21 @@ static void init_tls() {
 }
 
 void _init(int cid, int nc) {
-// printstr("_init!\n");
+printstr("_init!\n");
 // init_tls();
 // thread_entry(cid, nc);
 
 // only single-threaded programs should ever get here.
-// printstr("main\n");
-// #if MAIN_HAS_NOARGC
-//   MAIN_RETURN_TYPE main(void);
-//   int ret = main();
-// #else
-//   MAIN_RETURN_TYPE main(int argc, char* argv[]);
-//   int ret = main(0, 0);
-// #endif
-  int ret = 0;
-  inner_main();
+printstr("before main\n");
+#if MAIN_HAS_NOARGC
+  MAIN_RETURN_TYPE main(void);
+  int ret = main();
+#else
+  MAIN_RETURN_TYPE main(int argc, char* argv[]);
+  int ret = main(0, 0);
+#endif
+  // int ret = 0;
+  // inner_main();
 
   char buf[NUM_COUNTERS * 32] __attribute__((aligned(64)));
   char* pbuf = buf;
@@ -684,6 +684,9 @@ static void vprintfmt(void (*putch)(int, void**), void** putdat,
 }
 
 int printf(const char* fmt, ...) {
+  return 0;
+}
+int printf2(const char* fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
 
