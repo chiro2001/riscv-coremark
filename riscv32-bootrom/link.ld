@@ -31,13 +31,26 @@ SECTIONS
   .text : { *(.text) }
 
   /* data segment */
-  .data : { *(.data) }
+  /* .data : { *(.data) } */
+  .data : {
+    *(.data)
+    *(.data.*)
 
-  .sdata : {
+    *(.data1)
+    *(.data1.*)
+
+    . = ALIGN(4);
+    PROVIDE( __global_pointer$ = . + 0x800 );
+
+    *(.sdata)
+    *(.sdata.*)
+  }
+
+  /* .sdata : {
     __global_pointer$ = . + 0x800;
     *(.srodata.cst16) *(.srodata.cst8) *(.srodata.cst4) *(.srodata.cst2) *(.srodata*)
     *(.sdata .sdata.* .gnu.linkonce.s.*)
-  }
+  } */
 
   /* bss segment */
   .sbss : {
