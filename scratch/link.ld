@@ -8,34 +8,25 @@
  * 2020/12/12     bernard      The first version
  */
 
-INCLUDE "link_stacksize.lds"
-
 OUTPUT_ARCH( "riscv" )
 
 /*
  * Memory layout:
- * 0x10200000 - 0x10201000: Bootloader
- * 0x10201000 - 0x10A00000: Kernel
- * 0x10A00000 - 0x11200000: Heap
+ * 0x80000000 - end: all
  */
-
-MEMORY
-{
-   FLASH : ORIGIN = __START_ADDR__, LENGTH = 0x80000 /*0x8000000*/
-   RAM   : ORIGIN = __STACK_ADDR__, LENGTH = 0x40000 /*0x10000000*/
-}
+__STACKSIZE__ = 0x400;
 
 ENTRY(_start)
 SECTIONS
 {
-    . = __START_ADDR__ ;
+    . = 0x80000000 ;
 
     /* __STACKSIZE__ = 4096; */
 
     .start :
     {
         *(.start);
-    } > FLASH
+    }
 
     . = ALIGN(4);
 
@@ -73,14 +64,14 @@ SECTIONS
 
         . = ALIGN(4);
         _etext = .;
-    } > FLASH
+    }
 
-    .eh_frame_hdr : 
+    /* .eh_frame_hdr : 
     { 
          *(.eh_frame_hdr) 
          *(.eh_frame_entry)
-    } > FLASH
-    .eh_frame : ONLY_IF_RO { KEEP (*(.eh_frame)) } > FLASH
+    }
+    .eh_frame : ONLY_IF_RO { KEEP (*(.eh_frame)) } */
 
     . = ALIGN(4);
 
@@ -97,11 +88,11 @@ SECTIONS
 
         *(.sdata)
         *(.sdata.*)
-    } > FLASH
+    }
 
     /* stack */
 
-    . = __STACK_ADDR__;
+    /* . = __STACK_ADDR__; */
 
     .stack :
     {
@@ -110,7 +101,7 @@ SECTIONS
 
         . += __STACKSIZE__;
         __stack_cpu0 = .;
-    } > RAM
+    }
 
     .sbss : 
     {
@@ -119,7 +110,7 @@ SECTIONS
         *(.sbss.*)
         *(.dynsbss)
         *(.scommon)
-    } > RAM
+    }
 
     .bss :
     {
@@ -128,7 +119,7 @@ SECTIONS
         *(.dynbss)
         *(COMMON)
     __bss_end = .;
-    } > RAM
+    }
 
     _end = .;
 
