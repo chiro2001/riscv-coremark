@@ -52,8 +52,43 @@ volatile ee_s32 seed5_volatile = 0;
    does not occur. If there are issues with the return value overflowing,
    increase this value.
         */
+#if USE_CLOCK
+#define NSECS_PER_SEC CLOCKS_PER_SEC
+#define EE_TIMER_TICKER_RATE 1000
+#define CORETIMETYPE clock_t
+#define GETMYTIME(_t) (*_t = clock())
+#define MYTIMEDIFF(fin, ini) ((fin) - (ini))
+#define TIMER_RES_DIVIDER 1
+#define SAMPLE_TIME_IMPLEMENTATION 1
+#elif defined(_MSC_VER)
+#define NSECS_PER_SEC 10000000
+#define EE_TIMER_TICKER_RATE 1000
+#define CORETIMETYPE FILETIME
+#define GETMYTIME(_t) GetSystemTimeAsFileTime(_t)
+#define MYTIMEDIFF(fin, ini) \
+  (((*(__int64 *)&fin) - (*(__int64 *)&ini)) / TIMER_RES_DIVIDER)
+/* setting to millisces resolution by default with MSDEV */
+#ifndef TIMER_RES_DIVIDER
+#define TIMER_RES_DIVIDER 1000
+#endif
+#define SAMPLE_TIME_IMPLEMENTATION 1
+#elif HAS_TIME_H
+#define NSECS_PER_SEC 1000000000
+#define EE_TIMER_TICKER_RATE 1000
+#define CORETIMETYPE struct timespec
+#define GETMYTIME(_t) clock_gettime(CLOCK_REALTIME, _t)
+#define MYTIMEDIFF(fin, ini)                                         \
+  ((fin.tv_sec - ini.tv_sec) * (NSECS_PER_SEC / TIMER_RES_DIVIDER) + \
+   (fin.tv_nsec - ini.tv_nsec) / TIMER_RES_DIVIDER)
+/* setting to 1/1000 of a second resolution by default with linux */
+#ifndef TIMER_RES_DIVIDER
+#define TIMER_RES_DIVIDER 1000000
+#endif
+#define SAMPLE_TIME_IMPLEMENTATION 1
+#else
 // Defined for RISCV
-#define NSECS_PER_SEC 100000000    // TODO: What freq are we assuming?
+//                     630676200
+#define NSECS_PER_SEC 1000000000   // TODO: What freq are we assuming?
 #define EE_TIMER_TICKER_RATE 1000  // TODO: What is this?
 #define CORETIMETYPE clock_t
 #define read_csr(reg)                             \
@@ -66,6 +101,7 @@ volatile ee_s32 seed5_volatile = 0;
 #define MYTIMEDIFF(fin, ini) ((fin) - (ini))
 #define TIMER_RES_DIVIDER 1
 #define SAMPLE_TIME_IMPLEMENTATION 1
+#endif
 #define EE_TICKS_PER_SEC (NSECS_PER_SEC / TIMER_RES_DIVIDER)
 
 /** Define Host specific (POSIX), or target specific global time variables. */
@@ -125,7 +161,6 @@ void portable_init(core_portable *p, int *argc, char *argv[]) {
   (void)argc;  // prevent unused warning
   (void)argv;  // prevent unused warning
 
-  DBG_L("portable_init");
   if (sizeof(ee_ptr_int) != sizeof(ee_u8 *)) {
     puts(
         "ERROR! Please define ee_ptr_int to a type that holds a "
@@ -135,7 +170,6 @@ void portable_init(core_portable *p, int *argc, char *argv[]) {
     ee_printf("ERROR! Please define ee_u32 to a 32b unsigned type!\n");
   }
   p->portable_id = 1;
-  DBG_L("portable_init done");
 }
 /* Function : portable_fini
         Target specific final code

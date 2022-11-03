@@ -162,7 +162,7 @@ void core_init_state(ee_u32 size, ee_s16 seed, ee_u8 *p) {
   size++;
   while (total < size) { /* fill the rest with 0 */
     // printf("MEM[%x] = 0\n", p + total);
-    printf("%x \n", p + total);
+    // printf("%x \n", p + total);
     *(p + total) = 0;
     total++;
   }

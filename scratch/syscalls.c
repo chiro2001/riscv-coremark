@@ -264,6 +264,8 @@ int puts(const char* s) {
   return 0;
 }
 
+#pragma GCC push_options
+#pragma GCC optimize("O0")
 void* memset(void* dest, int byte, size_t len) {
   if ((((uintptr_t)dest | len) & (sizeof(uintptr_t) - 1)) == 0) {
     uintptr_t word = byte & 0xFF;
@@ -278,7 +280,13 @@ void* memset(void* dest, int byte, size_t len) {
     while (d < (char*)(dest + len)) *d++ = byte;
   }
   return dest;
+  // uint8_t *p = dest;
+  // while(len--) {
+  //   *(p++) = byte;
+  // }
+  // return dest;
 }
+#pragma GCC pop_options
 
 void handle_trap(size_t xcause, size_t xtval, size_t xepc, uint32_t* sp) {
   printf("trap! xcause = %x\n", xcause);

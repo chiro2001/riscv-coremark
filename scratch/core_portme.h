@@ -31,7 +31,7 @@ Original Author: Shay Gal-on
  * TODO
  * 
  */
-#define HAS_FLOAT 0
+#define HAS_FLOAT 1
 #define MAIN_HAS_NOARGC 1
 
 #define ITERATIONS COREMARK_ITERATIONS
