@@ -24,7 +24,10 @@ FILE_DUMP := $(EXE_PREFIX).dump
 .PHONY: default
 default: $(FILE_BIN) $(FILE_DUMP)
 
-$(FILE_EXE):
+mkbuildir:
+	-mkdir -p $(BUILD_DIR)
+
+$(FILE_EXE): mkbuildir
 	$(CC) $(CORE_SRCS) $(PORT_SRCS) $(CFLAGS) -o $(FILE_EXE)
 
 $(FILE_BIN): $(FILE_EXE)
@@ -32,7 +35,6 @@ $(FILE_BIN): $(FILE_EXE)
 
 $(FILE_DUMP): $(FILE_EXE)
 	$(DUMP) -d $(FILE_EXE) > $(FILE_DUMP)
-
 .PHONY: clean
 clean:
 	-rm -rf $(FILE_EXE) $(FILE_BIN) $(FILE_DUMP)
