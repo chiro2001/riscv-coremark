@@ -19,7 +19,7 @@ CFLAGS += -DFLAGS_STR=\"$(FLAGS_STR)\"
 EXE_PREFIX := $(BUILD_DIR)/coremark.perf
 FILE_EXE := $(EXE_PREFIX).riscv
 FILE_BIN := $(EXE_PREFIX).bin
-FILE_DUMP := $(EXE_PREFIX).dump
+FILE_DUMP := $(EXE_PREFIX).asm
 
 .PHONY: default
 default: $(FILE_BIN) $(FILE_DUMP)
@@ -34,7 +34,7 @@ $(FILE_BIN): $(FILE_EXE)
 	$(COPY) -O binary $^ $@
 
 $(FILE_DUMP): $(FILE_EXE)
-	$(DUMP) -d $(FILE_EXE) > $(FILE_DUMP)
+	$(DUMP) -d -S $(FILE_EXE) > $(FILE_DUMP)
 .PHONY: clean
 clean:
 	-rm -rf $(FILE_EXE) $(FILE_BIN) $(FILE_DUMP)

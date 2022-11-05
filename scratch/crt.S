@@ -38,12 +38,12 @@ _start:
 	addi a4,zero,'R'
 	addi a5,zero,'T'
 	addi a6,zero,'\n'
-  sb a1,0(a0)
-	sb a2,0(a0)
-	sb a3,0(a0)
-	sb a4,0(a0)
-	sb a5,0(a0)
-	sb a6,0(a0)
+  sw a1,0(a0)
+	sw a2,0(a0)
+	sw a3,0(a0)
+	sw a4,0(a0)
+	sw a5,0(a0)
+	sw a6,0(a0)
   # j _start
   li  x1, 0
   li  x2, 0
