@@ -14,7 +14,7 @@ OUTPUT_ARCH( "riscv" )
  * Memory layout:
  * 0x80000000 - end: DDR
  */
-__STACKSIZE__ = 0x4000;
+__STACKSIZE__ = 32768;
 
 ENTRY(_start)
 SECTIONS
