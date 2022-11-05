@@ -1,5 +1,18 @@
-# See LICENSE for license details.
+/*
+ * Copyright (c) 2006-2022, RT-Thread Development Team
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Change Logs:
+ * Date           Author       Notes
+ * 2018/10/01     Bernard      The first version
+ * 2018/12/27     Jesven       Add SMP support
+ * 2020/6/12      Xim          Port to QEMU and remove SMP support
+ */
 
+#define XSTATUS_FS         (3 << 13) /* initial state of FPU, clear to disable */
+#define XSTATUS_PUM        (1 << 18)
+#include "cpuport.h"
 #include "encoding.h"
 
 #if __riscv_xlen == 64
@@ -12,8 +25,11 @@
 # define REGBYTES 4
 #endif
 
-  .section ".text.init"
-  .globl _start
+boot_hartid: .int
+  .global      boot_hartid
+
+  .global   _start
+  .section ".start", "ax"
 _start:
   // for sifive uart
   lui a0,0x54000000>>12
@@ -40,7 +56,7 @@ _start:
 	sw a4,0(a0)
 	sw a5,0(a0)
 	sw a6,0(a0)
-  
+  # j _start
   li  x1, 0
   li  x2, 0
   li  x3, 0
@@ -73,97 +89,40 @@ _start:
   li  x30,0
   li  x31,0
 
-  # enable FPU and accelerator if present
-  li t0, MSTATUS_FS | MSTATUS_XS
-  csrs mstatus, t0
+  # setup stacks per hart
+  csrr t0, mhartid                  # read current hart id
+  slli t0, t0, 10                   # shift left the hart id by 1024
 
-  # make sure XLEN agrees with compilation choice
-  li t0, 1
-  slli t0, t0, 31
-#if __riscv_xlen == 64
-  bgez t0, 1f
-#else
-  bltz t0, 1f
-#endif
-2:
-  li a0, 1
-  sw a0, tohost, t0
-  j 2b
-1:
+  # park harts with id != 0
+  csrr a0, mhartid                  # read current hart id
+  bnez a0, park                     # if we're not on the hart 0
 
-#ifdef __riscv_flen
-  # initialize FPU if we have one
-  la t0, 1f
-  csrw mtvec, t0
+  csrw SRC_XIE, 0                   # clear Interrupt Registers
+  csrw SRC_XIP, 0
 
-  fssr    x0
-  fmv.s.x f0, x0
-  fmv.s.x f1, x0
-  fmv.s.x f2, x0
-  fmv.s.x f3, x0
-  fmv.s.x f4, x0
-  fmv.s.x f5, x0
-  fmv.s.x f6, x0
-  fmv.s.x f7, x0
-  fmv.s.x f8, x0
-  fmv.s.x f9, x0
-  fmv.s.x f10,x0
-  fmv.s.x f11,x0
-  fmv.s.x f12,x0
-  fmv.s.x f13,x0
-  fmv.s.x f14,x0
-  fmv.s.x f15,x0
-  fmv.s.x f16,x0
-  fmv.s.x f17,x0
-  fmv.s.x f18,x0
-  fmv.s.x f19,x0
-  fmv.s.x f20,x0
-  fmv.s.x f21,x0
-  fmv.s.x f22,x0
-  fmv.s.x f23,x0
-  fmv.s.x f24,x0
-  fmv.s.x f25,x0
-  fmv.s.x f26,x0
-  fmv.s.x f27,x0
-  fmv.s.x f28,x0
-  fmv.s.x f29,x0
-  fmv.s.x f30,x0
-  fmv.s.x f31,x0
-1:
-#endif
-
-  # initialize trap vector
   la t0, trap_entry
-  csrw mtvec, t0
+  csrw SRC_XTVEC, t0                # set Trap Vector Base Address Register
 
-  # initialize global pointer
+  /* set to disable FPU */
+  li t0, XSTATUS_FS                 # close fpu
+  csrc SRC_XSTATUS, t0
+
 .option push
 .option norelax
   la gp, __global_pointer$
 .option pop
 
-  la  tp, _end + 63
-  and tp, tp, -64
+  la   sp, __stack_start__
+  li   t0, __STACKSIZE__
+  add  sp, sp, t0
+  csrw SRC_XSCRATCH, sp
+  jal coremark_main
 
-  # get core id
-  csrr a0, mhartid
-  # for now, assume only 1 core
-  li a1, 1
-1:bgeu a0, a1, 1b
+park:
+    wfi
+    j park
 
-  # give each core 128KB of stack + TLS
-// #define STKSHIFT 17
-  # give each core 64KB of stack + TLS
-#define STKSHIFT 18
-  sll a2, a0, STKSHIFT
-  add tp, tp, a2
-  add sp, a0, 1
-  sll sp, sp, STKSHIFT
-  add sp, sp, tp
-
-  j _init
-
-  .align 2
+.align 8
 trap_entry:
   addi sp, sp, -272
 
@@ -199,6 +158,19 @@ trap_entry:
   SREG x30, 30*REGBYTES(sp)
   SREG x31, 31*REGBYTES(sp)
 
+  # lui a0,0x10000000>>12
+	# addi a1,zero,'T'
+	# addi a2,zero,'R'
+	# addi a3,zero,'A'
+	# addi a4,zero,'P'
+	# addi a5,zero,'!'
+	# addi a6,zero,'\n'
+  # sw a1,0(a0)
+	# sw a2,0(a0)
+	# sw a3,0(a0)
+	# sw a4,0(a0)
+	# sw a5,0(a0)
+	# sw a6,0(a0)
   csrr a0, mcause
   csrr a1, mepc
   mv a2, sp
@@ -243,23 +215,3 @@ trap_entry:
 
   addi sp, sp, 272
   mret
-
-.section ".tdata.begin"
-.globl _tdata_begin
-_tdata_begin:
-
-.section ".tdata.end"
-.globl _tdata_end
-_tdata_end:
-
-.section ".tbss.end"
-.globl _tbss_end
-_tbss_end:
-
-.section ".tohost","aw",@progbits
-.align 6
-.globl tohost
-tohost: .dword 0
-.align 6
-.globl fromhost
-fromhost: .dword 0
