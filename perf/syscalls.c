@@ -8,6 +8,7 @@
 #include "coremark.h"
 #include "util.h"
 #include "sifive-uart.h"
+#include "printf.h"
 
 // #define UART_PORT 0x54000000L
 
@@ -19,6 +20,10 @@ void write_uart(char* s, int len) {
     //   ;
     sifive_uart_putc(*(s++));
   }
+}
+
+void _putchar(char character) {
+  sifive_uart_putc(character);
 }
 
 size_t strlen(const char* s) {
@@ -243,23 +248,27 @@ static void vprintfmt(void (*putch)(int, void**), void** putdat,
   }
 }
 
-int ee_printf(const char* fmt, ...) {
-  // int len = strlen(fmt);
-  // while (len--) {
-  //   *((uint8_t*)(UART_PORT)) = *(fmt++);
-  //   uint32_t delay = 0x1f;
-  //   while (delay--)
-  //     ;
-  // }
-  // return 0;
-  va_list ap;
-  va_start(ap, fmt);
+// int ee_printf(const char* fmt, ...) {
+//   // int len = strlen(fmt);
+//   // while (len--) {
+//   //   *((uint8_t*)(UART_PORT)) = *(fmt++);
+//   //   uint32_t delay = 0x1f;
+//   //   while (delay--)
+//   //     ;
+//   // }
+//   // return 0;
 
-  vprintfmt((void*)putchar, 0, fmt, ap);
+//   // va_list ap;
+//   // va_start(ap, fmt);
 
-  va_end(ap);
-  return 0;  // incorrect return value, but who cares, anyway?
-}
+//   // vprintfmt((void*)putchar, 0, fmt, ap);
+
+//   // va_end(ap);
+
+//   char *p = fmt;
+//   while(p) putchar(*(p++));
+//   return 0;  // incorrect return value, but who cares, anyway?
+// }
 
 int puts(const char* s) {
   ee_printf(s);
@@ -291,7 +300,7 @@ void* memset(void* dest, int byte, size_t len) {
 #pragma GCC pop_options
 
 void handle_trap(size_t xcause, size_t xtval, size_t xepc, uint32_t* sp) {
-  printf("trap! xcause = %x\n", xcause);
+  // printf("trap! xcause = %x\n", xcause);
   // while (1) asm volatile("wfi");
   while (1)
     ;

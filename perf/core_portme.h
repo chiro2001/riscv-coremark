@@ -31,7 +31,7 @@ Original Author: Shay Gal-on
  * TODO
  * 
  */
-#define HAS_FLOAT 1
+// #define HAS_FLOAT 1
 #define MAIN_HAS_NOARGC 1
 
 #define ITERATIONS COREMARK_ITERATIONS
@@ -82,6 +82,8 @@ Original Author: Shay Gal-on
 #ifndef HAS_PRINTF
 #define HAS_PRINTF 1
 #endif
+
+#include "printf.h"
 
 #include <stddef.h>
 

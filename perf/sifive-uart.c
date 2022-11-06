@@ -29,77 +29,74 @@
 
 /* clang-format on */
 
-static volatile void *uart_base;
-static u32 uart_in_freq;
-static u32 uart_baudrate;
+// static volatile void *uart_base = 0;
+static u32 uart_in_freq = 0;
+static u32 uart_baudrate = 0;
+#ifndef uart_base
+#define uart_base UART_PORT
+#endif
 
 /**
  * Find minimum divisor divides in_freq to max_target_hz;
  * Based on uart driver n SiFive FSBL.
  *
  * f_baud = f_in / (div + 1) => div = (f_in / f_baud) - 1
- * The nearest integer solution requires rounding up as to not exceed max_target_hz.
- * div  = ceil(f_in / f_baud) - 1
- *	= floor((f_in - 1 + f_baud) / f_baud) - 1
- * This should not overflow as long as (f_in - 1 + f_baud) does not exceed
- * 2^32 - 1, which is unlikely since we represent frequencies in kHz.
+ * The nearest integer solution requires rounding up as to not exceed
+ *max_target_hz. div  = ceil(f_in / f_baud) - 1 = floor((f_in - 1 + f_baud) /
+ *f_baud) - 1 This should not overflow as long as (f_in - 1 + f_baud) does not
+ *exceed 2^32 - 1, which is unlikely since we represent frequencies in kHz.
  */
 static inline unsigned int uart_min_clk_divisor(uint64_t in_freq,
-						uint64_t max_target_hz)
-{
-	uint64_t quotient = (in_freq + max_target_hz - 1) / (max_target_hz);
-	// Avoid underflow
-	if (quotient == 0) {
-		return 0;
-	} else {
-		return quotient - 1;
-	}
+                                                uint64_t max_target_hz) {
+  uint64_t quotient = (in_freq + max_target_hz - 1) / (max_target_hz);
+  // Avoid underflow
+  if (quotient == 0) {
+    return 0;
+  } else {
+    return quotient - 1;
+  }
 }
 
-static u32 get_reg(u32 num)
-{
-	return readl(uart_base + (num * 0x4));
+static u32 get_reg(u32 num) {
+  if (uart_base)
+    return readl(uart_base + (num * 0x4));
+  else
+    return 0;
 }
 
-static void set_reg(u32 num, u32 val)
-{
-	writel(val, uart_base + (num * 0x4));
+static void set_reg(u32 num, u32 val) {
+  if (uart_base) writel(val, uart_base + (num * 0x4));
 }
 
-void sifive_uart_putc(char ch)
-{
-	while (get_reg(UART_REG_TXFIFO) & UART_TXFIFO_FULL)
-		;
+void sifive_uart_putc(char ch) {
+  while (get_reg(UART_REG_TXFIFO) & UART_TXFIFO_FULL)
+    ;
 
-	set_reg(UART_REG_TXFIFO, ch);
+  set_reg(UART_REG_TXFIFO, ch);
 }
 
-int sifive_uart_getc(void)
-{
-	u32 ret = get_reg(UART_REG_RXFIFO);
-	if (!(ret & UART_RXFIFO_EMPTY))
-		return ret & UART_RXFIFO_DATA;
-	return -1;
+int sifive_uart_getc(void) {
+  u32 ret = get_reg(UART_REG_RXFIFO);
+  if (!(ret & UART_RXFIFO_EMPTY)) return ret & UART_RXFIFO_DATA;
+  return -1;
 }
 
-int sifive_uart_init(unsigned long base, u32 in_freq, u32 baudrate)
-{
-	uart_base     = (volatile void *)base;
-	uart_in_freq  = in_freq;
-	uart_baudrate = baudrate;
+int sifive_uart_init(unsigned long base, u32 in_freq, u32 baudrate) {
+  // uart_base = (volatile void *)base;
+  uart_in_freq = in_freq;
+  uart_baudrate = baudrate;
 
-	/* Configure baudrate */
-	// set_reg(UART_REG_DIV, uart_min_clk_divisor(in_freq, baudrate));
-	/* Disable interrupts */
-	set_reg(UART_REG_IE, 0);
-	/* Enable TX */
-	set_reg(UART_REG_TXCTRL, UART_TXCTRL_TXEN);
-	/* Enable Rx */
-	set_reg(UART_REG_RXCTRL, UART_RXCTRL_RXEN);
+  /* Configure baudrate */
+  // set_reg(UART_REG_DIV, uart_min_clk_divisor(in_freq, baudrate));
+  /* Disable interrupts */
+  // set_reg(UART_REG_IE, 0);
+  // /* Enable TX */
+  // set_reg(UART_REG_TXCTRL, UART_TXCTRL_TXEN);
+  // /* Enable Rx */
+  // set_reg(UART_REG_RXCTRL, UART_RXCTRL_RXEN);
+  // init done in start.s
 
-	return 0;
+  return 0;
 }
 
-void uart_init(void) {
-	sifive_uart_init(UART_PORT, 100000000, 115200);
-}
+void uart_init(void) { sifive_uart_init(UART_PORT, 100000000, 115200); }
