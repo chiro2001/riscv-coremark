@@ -11,7 +11,7 @@ PORT_DIR := $(BASE_DIR)
 CORE_SRCS := $(PORT_DIR)/core_list_join.c $(PORT_DIR)/core_main.c $(PORT_DIR)/core_matrix.c $(PORT_DIR)/core_state.c $(PORT_DIR)/core_util.c
 PORT_SRCS := $(PORT_DIR)/core_portme.c $(PORT_DIR)/syscalls.c $(PORT_DIR)/crt.S
 # CONFIG_FLAGS := -DCOREMARK_ITERATIONS=1
-PORT_CFLAGS := -O3 -mcmodel=medany -static -std=gnu99 -fno-common -nostdlib -nostartfiles -lm -lgcc -T $(PORT_DIR)/link.ld -g -I$(PORT_DIR)
+PORT_CFLAGS := -O3 -mcmodel=medany -static -std=gnu99 -fno-common -nostdlib -nostartfiles -lm -lgcc -T $(PORT_DIR)/link.ld -g -I$(PORT_DIR) -g
 FLAGS_STR := "$(PORT_CFLAGS) $(XCFLAGS) $(XLFLAGS) $(LFLAGS_END)"
 CFLAGS += $(PORT_CFLAGS) $(CONFIG_FLAGS)
 CFLAGS += -DFLAGS_STR=\"$(FLAGS_STR)\"
