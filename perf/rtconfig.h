@@ -151,7 +151,9 @@
 
 /* tools packages */
 
+#ifndef COREMARK_ITERATIONS
 #define COREMARK_ITERATIONS 2
+#endif
 
 /* system packages */
 

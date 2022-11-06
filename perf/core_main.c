@@ -127,10 +127,11 @@ coremark_main(int argc, char *argv[]) {
   results[0].seed2 = get_seed(2);
   results[0].seed3 = get_seed(3);
   results[0].iterations = get_seed_32(4);
-// #if CORE_DEBUG
+#if CORE_DEBUG
   results[0].iterations = 1;
-// #endif
+#endif
   if (results[0].iterations == 0) printf("iteration need inititaion!\n");
+  else printf("iteration = %d\n", results[0].iterations);
   results[0].execs = get_seed_32(5);
   if (results[0].execs == 0) { /* if not supplied, execute all algorithms */
     results[0].execs = ALL_ALGORITHMS_MASK;
@@ -322,8 +323,10 @@ for (i = 0; i < MULTITHREAD; i++) {
   ee_printf("Total ticks      : %lu\n", (long unsigned)total_time);
 #if HAS_FLOAT
   ee_printf("Total time (secs): %f\n",time_in_secs(total_time));
-	if (time_in_secs(total_time) > 0)
+	if (time_in_secs(total_time) > 0) {
 		ee_printf("Iterations/Sec   : %f\n",default_num_contexts*results[0].iterations/time_in_secs(total_time));
+		ee_printf("Coremark/MHz     : %f\n",(float)(default_num_contexts*results[0].iterations/time_in_secs(total_time)) / DEFINE_CPU_FREQ_MHZ);
+  }
 #else
   ee_printf("Total time (secs): %d\n", time_in_secs(total_time));
   if (time_in_secs(total_time) > 0)

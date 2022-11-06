@@ -34,6 +34,10 @@ Original Author: Shay Gal-on
 #define HAS_FLOAT 1
 #define MAIN_HAS_NOARGC 1
 
+#ifndef DEFINE_CPU_FREQ_MHZ
+#define DEFINE_CPU_FREQ_MHZ 5
+#endif
+
 #define ITERATIONS COREMARK_ITERATIONS
 
 #ifdef COREMARK_PROFILE

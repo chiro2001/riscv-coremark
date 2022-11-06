@@ -88,7 +88,8 @@ volatile ee_s32 seed5_volatile = 0;
 #else
 // Defined for RISCV
 //                     630676200
-#define NSECS_PER_SEC 1000000000   // TODO: What freq are we assuming?
+// #define NSECS_PER_SEC 1000000000   // TODO: What freq are we assuming?
+#define NSECS_PER_SEC 5000000   // TODO: What freq are we assuming?
 #define EE_TIMER_TICKER_RATE 1000  // TODO: What is this?
 #define CORETIMETYPE clock_t
 #define read_csr(reg)                             \
