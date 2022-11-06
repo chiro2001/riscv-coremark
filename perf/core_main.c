@@ -321,11 +321,9 @@ for (i = 0; i < MULTITHREAD; i++) {
   ee_printf("CoreMark Size    : %lu\n", (long unsigned)results[0].size);
   ee_printf("Total ticks      : %lu\n", (long unsigned)total_time);
 #if HAS_FLOAT
-  ee_printf("Total time (secs): %d\n", (int)time_in_secs(total_time));
-  if (time_in_secs(total_time) > 0)
-    ee_printf("Iterations/Sec   : %d\n",
-              (int)(default_num_contexts * results[0].iterations /
-                    time_in_secs(total_time)));
+  ee_printf("Total time (secs): %f\n",time_in_secs(total_time));
+	if (time_in_secs(total_time) > 0)
+		ee_printf("Iterations/Sec   : %f\n",default_num_contexts*results[0].iterations/time_in_secs(total_time));
 #else
   ee_printf("Total time (secs): %d\n", time_in_secs(total_time));
   if (time_in_secs(total_time) > 0)
