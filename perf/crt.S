@@ -32,7 +32,7 @@ boot_hartid: .int
   .section ".start", "ax"
 _start:
   // for sifive uart
-  lui a0,0x54000000>>12
+  li a0,0x54000000
 	// disable interrupts
 	li a1,0
 	sw a1,16(a0)
@@ -45,18 +45,12 @@ _start:
 
 	// print START\n
 	addi a1,zero,'C'
-	addi a2,zero,'O'
-	addi a3,zero,'R'
-	addi a4,zero,'E'
-	addi a5,zero,'M'
-	addi a6,zero,'\n'
-  sw a1,0(a0)
+	addi a2,zero,'M'
+	addi a3,zero,'\n'
+	sw a1,0(a0)
 	sw a2,0(a0)
 	sw a3,0(a0)
-	sw a4,0(a0)
-	sw a5,0(a0)
-	sw a6,0(a0)
-  # j _start
+	# j _start
   li  x1, 0
   li  x2, 0
   li  x3, 0

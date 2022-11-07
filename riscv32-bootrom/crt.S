@@ -16,7 +16,7 @@
   .globl _start
 _start:
   // for sifive uart
-  lui a0,0x54000000>>12
+  li a0,0x54000000
 	// disable interrupts
 	li a1,0
 	sw a1,16(a0)
