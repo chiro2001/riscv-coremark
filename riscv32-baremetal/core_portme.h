@@ -262,7 +262,7 @@ extern ee_u32 default_num_contexts;
 	#define PARALLEL_METHOD "Sockets"
 #else
 	#define PARALLEL_METHOD "Proprietary"
-	#error "Please implement multicore functionality in core_portme.c to use multiple contexts."
+	// #error "Please implement multicore functionality in core_portme.c to use multiple contexts."
 #endif /* Method for multithreading */
 #endif /* MULTITHREAD > 1 */
 
