@@ -114,12 +114,12 @@ _start:
   li t0, SMP_FINISH_FLAG
   add t0, t0, a1
   sw zero, 0(t0)
-  .word 0x00a0500f
+  .word 0x2d00f
 
   li t0, SMP_START_FLAG
   add t0, t0, a1                    # get start flag place
   sw a0, 0(t0)                      # write its own hart id!
-  .word 0x00a0500f
+  .word 0x2d00f
 
   # then jump to park for subharts
   bnez a0, park                     # if we're not on the hart 0
@@ -129,7 +129,7 @@ _start:
 park:
     # note that a0 now is hart id, a1 is shifted hart id, t0 is flag
     # first flush cache
-    .word 0x00a0500f
+    .word 0x2d00f
     lw t1, 0(t0)
     # it is not zero, then loop
     bnez t1, park
@@ -175,6 +175,14 @@ trap_entry:
   SREG x29, 29*REGBYTES(sp)
   SREG x30, 30*REGBYTES(sp)
   SREG x31, 31*REGBYTES(sp)
+
+  li a0,0x54000000
+  li a1,'T'
+  li a2,'0'
+  csrr t0, mhartid
+  add a2,a2,t0
+	sw a1,0(a0)
+	sw a2,0(a0)
 
   csrr a0, mcause
   csrr a1, mepc

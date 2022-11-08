@@ -136,7 +136,7 @@ coremark_main(int argc, char *argv[]) {
   results[0].iterations = 1;
 #endif
   if (results[0].iterations == 0) printf("iteration need inititaion!\n");
-  else printf("iteration = %d\n", results[0].iterations);
+  else printf("iteration = %d, MULTITHREAD = %d\n", results[0].iterations, MULTITHREAD);
   results[0].execs = get_seed_32(5);
   if (results[0].execs == 0) { /* if not supplied, execute all algorithms */
     results[0].execs = ALL_ALGORITHMS_MASK;
@@ -158,6 +158,9 @@ coremark_main(int argc, char *argv[]) {
   results[0].memblock[0] = (void *)static_memblk;
   results[0].size = TOTAL_DATA_SIZE;
   results[0].err = 0;
+  
+  results[0].hart_id=0;
+
 #if (MULTITHREAD > 1)
   for (i = 1; i < MULTITHREAD; i++) {
     results[i].memblock[0] = (void *)static_memblk + i * TOTAL_DATA_SIZE;
