@@ -176,3 +176,14 @@ void portable_init(core_portable *p, int *argc, char *argv[]) {
         Target specific final code
 */
 void portable_fini(core_portable *p) { p->portable_id = 0; }
+
+ee_u8 core_start_parallel(core_results *res) {
+  // write res address
+  *(ee_u32 *)(SMP_PARAM_ADDR + res->hart_id * 4) = (ee_u32) res;
+  // start the core
+  *(ee_u32 *)(SMP_START_FLAG + res->hart_id * 4) = 0;
+
+}
+ee_u8 core_stop_parallel(core_results *res) {
+  // TODO
+}

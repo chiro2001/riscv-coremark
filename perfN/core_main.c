@@ -46,7 +46,7 @@ void *iterate(void *pres) {
   ee_u32 i;
   ee_u16 crc;
   core_results *res = (core_results *)pres;
-  if (!res || (res && !res->list)) while (1) asm volatile("wfi");
+  // if (!res || (res && !res->list)) while (1) asm volatile("wfi");
   ee_u32 iterations = res->iterations;
   res->crc = 0;
   res->crclist = 0;
@@ -73,7 +73,7 @@ ee_s32 get_seed_32(int i);
 #endif
 
 #if (MEM_METHOD == MEM_STATIC)
-ee_u8 static_memblk[TOTAL_DATA_SIZE];
+ee_u8 static_memblk[TOTAL_DATA_SIZE * MULTITHREAD];
 #endif
 char *mem_name[3] = {"Static", "Heap", "Stack"};
 /* Function: main
@@ -154,7 +154,16 @@ coremark_main(int argc, char *argv[]) {
   results[0].size = TOTAL_DATA_SIZE;
   results[0].err = 0;
 #if (MULTITHREAD > 1)
-#error "Cannot use a static data area with multiple contexts!"
+  for (i = 1; i < MULTITHREAD; i++) {
+    results[i].memblock[0] = (void *)static_memblk + i * TOTAL_DATA_SIZE;
+    results[i].size = TOTAL_DATA_SIZE;
+    results[i].seed1 = results[0].seed1;
+    results[i].seed2 = results[0].seed2;
+    results[i].seed3 = results[0].seed3;
+    results[i].err = 0;
+    results[i].execs = results[0].execs;
+    results[i].hart_id = i;
+  }
 #endif
 #elif (MEM_METHOD == MEM_MALLOC)
   for (i = 0; i < MULTITHREAD; i++) {
@@ -246,12 +255,15 @@ for (i = 0; i < MULTITHREAD; i++) {
   if (default_num_contexts > MULTITHREAD) {
     default_num_contexts = MULTITHREAD;
   }
-  for (i = 0; i < default_num_contexts; i++) {
+  for (i = 1; i < default_num_contexts; i++) {
     results[i].iterations = results[0].iterations;
     results[i].execs = results[0].execs;
     core_start_parallel(&results[i]);
   }
-  for (i = 0; i < default_num_contexts; i++) {
+
+  iterate(&results[0]);
+
+  for (i = 1; i < default_num_contexts; i++) {
     core_stop_parallel(&results[i]);
   }
 #else

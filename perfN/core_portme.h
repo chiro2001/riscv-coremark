@@ -34,7 +34,7 @@ Original Author: Shay Gal-on
 #define HAS_FLOAT 1
 #define MAIN_HAS_NOARGC 1
 #ifndef CPUS
-#define CPUS 1
+#define CPUS 4
 #endif
 
 #ifndef DEFINE_CPU_FREQ_MHZ
@@ -248,7 +248,7 @@ extern ee_u32 default_num_contexts;
 	#define PARALLEL_METHOD "Sockets"
 #else
 	#define PARALLEL_METHOD "Proprietary"
-	#error "Please implement multicore functionality in core_portme.c to use multiple contexts."
+
 #endif /* Method for multithreading */
 #endif /* MULTITHREAD > 1 */
 

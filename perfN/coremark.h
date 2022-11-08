@@ -39,6 +39,7 @@ Original Author: Shay Gal-on
 
 #include <stddef.h>
 #include <stdint.h>
+#include "cpuport.h"
 #include "core_portme.h"
 
 #if HAS_STDIO
@@ -158,6 +159,9 @@ typedef struct RESULTS_S
     ee_s16 err;
     /* ultithread specific */
     core_portable port;
+#if (MULTITHREAD > 1)
+    ee_u32 hart_id;
+#endif
 } core_results;
 
 /* Multicore execution handling */

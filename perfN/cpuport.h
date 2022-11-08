@@ -13,6 +13,19 @@
 
 #include "rtconfig.h"
 
+/**
+ * SMP Coremark
+ *   
+ *    - (word) 0x8700_0004, 0x8700_0008, ... <= These are start flags for each core, when it is written non-zero value, then park!
+ *    - (word) 0x8700_0104, 0x8700_0108, ... <= These are used for pass coremark iterate function parameter address!
+ *    - (word) 0x8700_0204, 0x8700_0208, ... <= These are returned values!
+ * 
+ */
+
+#define SMP_START_FLAG 0x87000000
+#define SMP_PARAM_ADDR 0x87000100
+#define SMP_RETURN_ADDR 0x87000200
+
 /* bytes of register width  */
 #ifdef ARCH_CPU_64BIT
 #error "Have not support 64-bit yet"
