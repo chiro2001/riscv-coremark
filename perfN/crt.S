@@ -102,14 +102,18 @@ _start:
   la gp, __global_pointer$
 .option pop
 
-  la   sp, __stack_start__
-  li   t0, __STACKSIZE__
-  add  sp, sp, t0
-  csrw SRC_XSCRATCH, sp
-
   # park harts with id != 0
   csrr a0, mhartid                  # t0 <- hartid
   slli a1, a0, 2                    # 0 -> 0, 1 -> 4, 2 -> 8 ...
+  slli a2, a0, 20                   # shift 1MB
+
+  # shift sp
+  la   sp, __stack_start__
+  add sp, sp, a2; # sp = sp + a2  
+  li   t0, __STACKSIZE__
+  # sub t0, t0, a2 # t0 = t0 - a2
+  add  sp, sp, t0
+  csrw SRC_XSCRATCH, sp
 
   li t0, SMP_FINISH_FLAG
   add t0, t0, a1
@@ -133,12 +137,27 @@ park:
     lw t1, 0(t0)
     # it is not zero, then loop
     bnez t1, park
+
+    li s3,0x54000000
+    addi a1,zero,'P'
+    addi a2,zero,'S'
+    addi a3,zero,'0'
+    addi a4,zero,'\n'
+    csrr t0, mhartid
+    add a3,a3,t0
+    sw a1,0(s3)
+    sw a2,0(s3)
+    sw a3,0(s3)
+    sw a4,0(s3)
     
     # should start
     li t0, SMP_PARAM_ADDR
     add t0, t0, a1
     lw a0, 0(t0)                 # load into a0, that is ABI-defined caller
-    j iterate
+    jal iterate
+cores_done:
+  wfi
+  j cores_done
 
 .align 8
 trap_entry:

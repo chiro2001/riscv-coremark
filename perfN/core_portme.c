@@ -152,7 +152,7 @@ secs_ret time_in_secs(CORE_TICKS ticks) {
   return retval;
 }
 
-ee_u32 default_num_contexts = 1;
+ee_u32 default_num_contexts = MULTITHREAD;
 
 /* Function : portable_init
         Target specific initialization code
@@ -178,6 +178,7 @@ void portable_init(core_portable *p, int *argc, char *argv[]) {
 void portable_fini(core_portable *p) { p->portable_id = 0; }
 
 ee_u8 core_start_parallel(core_results *res) {
+  printf("core_start_parallel!\n");
   // write res address
   *(ee_u32 *)(SMP_PARAM_ADDR + res->hart_id * 4) = (ee_u32) res;
   // start the core
