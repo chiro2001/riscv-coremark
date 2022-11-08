@@ -188,8 +188,8 @@ ee_u8 core_start_parallel(core_results *res) {
 ee_u8 core_stop_parallel(core_results *res) {
   ee_u32 flag = 0;
   do {
-    register ee_u32 flag_addr __asm__("t0");
-    __asm__(".word 0x2d00f");
+    // register ee_u32 flag_addr __asm__("t0");
+    __asm__(".word 0x500f");
     flag = *(ee_u32 *)(SMP_FINISH_FLAG + res->hart_id * 4);
   } while (flag == 0);
   return flag;
