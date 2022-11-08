@@ -24,7 +24,7 @@
 
 #define SMP_START_FLAG 0x87000000
 #define SMP_PARAM_ADDR 0x87000100
-#define SMP_RETURN_ADDR 0x87000200
+#define SMP_FINISH_FLAG 0x87000200
 
 /* bytes of register width  */
 #ifdef ARCH_CPU_64BIT

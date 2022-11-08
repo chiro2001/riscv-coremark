@@ -60,6 +60,11 @@ void *iterate(void *pres) {
     res->crc = crcu16(crc, res->crc);
     if (i == 0) res->crclist = res->crc;
   }
+  if (((core_results *)pres)->hart_id != 0) {
+    ee_u32 hart_id = ((core_results *)pres)->hart_id;
+    *(ee_u32 *)(SMP_FINISH_FLAG + hart_id * 4) = 1;
+    for(;;);
+  }
   return NULL;
 }
 

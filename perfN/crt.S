@@ -87,20 +87,6 @@ _start:
   li  x30,0
   li  x31,0
 
-  # setup stacks per hart
-  # csrr t0, mhartid                  # read current hart id
-  # slli t0, t0, 10                   # shift left the hart id by 1024
-
-  # park harts with id != 0
-  csrr a0, mhartid                  # t0 <- hartid
-  slli a1, a0, 2                    # 0 -> 0, 1 -> 4, 2 -> 8 ...
-  li t0, SMP_START_FLAG
-  add t0, t0, a1                    # get start flag place
-  sw a0, 0(t0)                      # write its own hart id!
-
-  # then jump to park for subharts
-  bnez a0, park                     # if we're not on the hart 0
-
   csrw SRC_XIE, 0                   # clear Interrupt Registers
   csrw SRC_XIP, 0
 
@@ -120,6 +106,24 @@ _start:
   li   t0, __STACKSIZE__
   add  sp, sp, t0
   csrw SRC_XSCRATCH, sp
+
+  # park harts with id != 0
+  csrr a0, mhartid                  # t0 <- hartid
+  slli a1, a0, 2                    # 0 -> 0, 1 -> 4, 2 -> 8 ...
+
+  li t0, SMP_FINISH_FLAG
+  add t0, t0, a1
+  sw zero, 0(t0)
+  .word 0x00a0500f
+
+  li t0, SMP_START_FLAG
+  add t0, t0, a1                    # get start flag place
+  sw a0, 0(t0)                      # write its own hart id!
+  .word 0x00a0500f
+
+  # then jump to park for subharts
+  bnez a0, park                     # if we're not on the hart 0
+
   jal coremark_main
 
 park:
@@ -127,7 +131,7 @@ park:
     # first flush cache
     .word 0x00a0500f
     lw t1, 0(t0)
-    // if it is not zero, then loop
+    # it is not zero, then loop
     bnez t1, park
     
     # should start
