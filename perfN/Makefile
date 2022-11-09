@@ -4,7 +4,7 @@ LD := $(CC)
 DUMP := $(CROSS_COMPILE)-objdump
 COPY := $(CROSS_COMPILE)-objcopy
 
-CPUS ?= 4 
+CPUS ?= 2
 
 BASE_DIR := $(abspath .)
 BUILD_DIR := $(BASE_DIR)/../../overlay
