@@ -24,6 +24,7 @@ Original Author: Shay Gal-on
 #define CORE_PORTME_H
 
 #include "rtconfig.h"
+#include "sifive-uart.h"
 
 /**
  * @brief Config here
@@ -34,11 +35,11 @@ Original Author: Shay Gal-on
 #define HAS_FLOAT 1
 #define MAIN_HAS_NOARGC 1
 #ifndef CPUS
-#define CPUS 4
+#define CPUS 2
 #endif
 
 #ifndef DEFINE_CPU_FREQ_MHZ
-#define DEFINE_CPU_FREQ_MHZ 5
+#define DEFINE_CPU_FREQ_MHZ 25
 #endif
 
 #define ITERATIONS COREMARK_ITERATIONS
@@ -164,6 +165,7 @@ typedef size_t         ee_size_t;
 */
 #ifndef MEM_METHOD
 #define MEM_METHOD MEM_STATIC
+// #define MEM_METHOD MEM_STACK
 #endif
 
 /* Configuration : MULTITHREAD

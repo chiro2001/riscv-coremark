@@ -47,11 +47,14 @@ get_seed_32(int i)
     {
         case 1:
             retval = seed1_volatile;
+            // retval = 0;
             break;
         case 2:
             retval = seed2_volatile;
+            // retval = 0;
             break;
         case 3:
+            // retval = 0x66;
             retval = seed3_volatile;
             break;
         case 4:

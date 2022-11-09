@@ -24,6 +24,7 @@ Original Author: Shay Gal-on
 #define CORE_PORTME_H
 
 #include "rtconfig.h"
+#include "sifive-uart.h"
 
 /**
  * @brief Config here

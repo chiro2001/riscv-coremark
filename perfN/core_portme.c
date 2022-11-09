@@ -89,7 +89,7 @@ volatile ee_s32 seed5_volatile = 0;
 // Defined for RISCV
 //                     630676200
 // #define NSECS_PER_SEC 1000000000   // TODO: What freq are we assuming?
-#define NSECS_PER_SEC 5000000   // TODO: What freq are we assuming?
+#define NSECS_PER_SEC (DEFINE_CPU_FREQ_MHZ * 1000000)   // TODO: What freq are we assuming?
 #define EE_TIMER_TICKER_RATE 1000  // TODO: What is this?
 #define CORETIMETYPE clock_t
 #define read_csr(reg)                             \
@@ -163,7 +163,7 @@ void portable_init(core_portable *p, int *argc, char *argv[]) {
   (void)argv;  // prevent unused warning
 
   if (sizeof(ee_ptr_int) != sizeof(ee_u8 *)) {
-    puts(
+    printf(
         "ERROR! Please define ee_ptr_int to a type that holds a "
         "pointer!\n");
   }

@@ -101,8 +101,6 @@ char *mem_name[3] = {"Static", "Heap", "Stack"};
 
 */
 
-#include "sifive-uart.h"
-
 #if MAIN_HAS_NOARGC
 MAIN_RETURN_TYPE
 coremark_main(void) {
@@ -125,13 +123,17 @@ coremark_main(int argc, char *argv[]) {
   portable_init(&(results[0].port), &argc, argv);
   /* First some checks to make sure benchmark will run ok */
   if (sizeof(struct list_head_s) > 128) {
-    puts("list_head structure too big for comparable data!\n");
+    printf("list_head structure too big for comparable data!\n");
     return MAIN_RETURN_VAL;
   }
-  results[0].seed1 = get_seed(1);
-  results[0].seed2 = get_seed(2);
-  results[0].seed3 = get_seed(3);
+  // results[0].seed1 = get_seed(1);
+  // results[0].seed2 = get_seed(2);
+  // results[0].seed3 = get_seed(3);
+  results[0].seed1 = 0;
+  results[0].seed2 = 0;
+  results[0].seed3 = 0x66;
   results[0].iterations = get_seed_32(4);
+  ee_printf("init seed: %d, %d, %d, %d, %d\n", results[0].seed1, results[0].seed2, results[0].seed3, results[0].size, seedcrc);
 #if CORE_DEBUG
   results[0].iterations = 1;
 #endif
@@ -154,6 +156,7 @@ coremark_main(int argc, char *argv[]) {
     results[0].seed2 = 0x3415;
     results[0].seed3 = 0x66;
   }
+  ee_printf("line %d: %d, %d, %d, %d, %d\n", __LINE__, results[0].seed1, results[0].seed2, results[0].seed3, results[0].size, seedcrc);
 #if (MEM_METHOD == MEM_STATIC)
   results[0].memblock[0] = (void *)static_memblk;
   results[0].size = TOTAL_DATA_SIZE;
@@ -172,6 +175,7 @@ coremark_main(int argc, char *argv[]) {
     results[i].execs = results[0].execs;
     results[i].hart_id = i;
   }
+  ee_printf("STATIC %d: %d, %d, %d, %d, %d\n", __LINE__, results[0].seed1, results[0].seed2, results[0].seed3, results[0].size, seedcrc);
 #endif
 #elif (MEM_METHOD == MEM_MALLOC)
   for (i = 0; i < MULTITHREAD; i++) {
@@ -191,9 +195,12 @@ coremark_main(int argc, char *argv[]) {
 for (i = 0; i < MULTITHREAD; i++) {
   results[i].memblock[0] = stack_memblock + i * TOTAL_DATA_SIZE;
   results[i].size = TOTAL_DATA_SIZE;
-  results[i].seed1 = results[0].seed1;
-  results[i].seed2 = results[0].seed2;
-  results[i].seed3 = results[0].seed3;
+  // results[i].seed1 = results[0].seed1;
+  // results[i].seed2 = results[0].seed2;
+  // results[i].seed3 = results[0].seed3;
+  results[i].seed1 = 0;
+  results[i].seed2 = 0;
+  results[i].seed3 = 0x66;
   results[i].err = 0;
   results[i].execs = results[0].execs;
 }
@@ -272,6 +279,7 @@ for (i = 0; i < MULTITHREAD; i++) {
   iterate(&results[0]);
 
   for (i = 1; i < default_num_contexts; i++) {
+    printf("stoping cpu %d\n", i);
     core_stop_parallel(&results[i]);
   }
 #else
@@ -279,6 +287,7 @@ for (i = 0; i < MULTITHREAD; i++) {
 #endif
   stop_time();
   total_time = get_time();
+  ee_printf("%d, %d, %d, %d, %d\n", results[0].seed1, results[0].seed2, results[0].seed3, results[0].size, seedcrc);
   /* get a function of the input to report */
   seedcrc = crc16(results[0].seed1, seedcrc);
   seedcrc = crc16(results[0].seed2, seedcrc);
@@ -288,26 +297,26 @@ for (i = 0; i < MULTITHREAD; i++) {
   switch (seedcrc) { /* test known output for common seeds */
     case 0x8a02:     /* seed1=0, seed2=0, seed3=0x66, size 2000 per algorithm */
       known_id = 0;
-      puts("6k performance run parameters for coremark.\n");
+      printf("6k performance run parameters for coremark.\n");
       break;
     case 0x7b05: /*  seed1=0x3415, seed2=0x3415, seed3=0x66, size 2000 per
                     algorithm */
       known_id = 1;
-      puts("6k validation run parameters for coremark.\n");
+      printf("6k validation run parameters for coremark.\n");
       break;
     case 0x4eaf: /* seed1=0x8, seed2=0x8, seed3=0x8, size 400 per algorithm
                   */
       known_id = 2;
-      puts("Profile generation run parameters for coremark.\n");
+      printf("Profile generation run parameters for coremark.\n");
       break;
     case 0xe9f5: /* seed1=0, seed2=0, seed3=0x66, size 666 per algorithm */
       known_id = 3;
-      puts("2K performance run parameters for coremark.\n");
+      printf("2K performance run parameters for coremark.\n");
       break;
     case 0x18f2: /*  seed1=0x3415, seed2=0x3415, seed3=0x66, size 666 per
                     algorithm */
       known_id = 4;
-      puts("2K validation run parameters for coremark.\n");
+      printf("2K validation run parameters for coremark.\n");
       break;
     default:
       total_errors = -1;
@@ -399,11 +408,11 @@ for (i = 0; i < MULTITHREAD; i++) {
 #if (MULTITHREAD > 1)
       ee_printf(" / %d:%s", default_num_contexts, PARALLEL_METHOD);
 #endif
-      puts("\n");
+      printf("\n");
     }
 #endif
   }
-  if (total_errors > 0) puts("Errors detected\n");
+  if (total_errors > 0) printf("Errors detected\n");
   if (total_errors < 0)
     ee_printf(
         "Cannot validate operation for these seed values, please compare "
