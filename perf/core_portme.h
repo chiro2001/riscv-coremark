@@ -35,7 +35,7 @@ Original Author: Shay Gal-on
 #define MAIN_HAS_NOARGC 1
 
 #ifndef DEFINE_CPU_FREQ_MHZ
-#define DEFINE_CPU_FREQ_MHZ 5
+#define DEFINE_CPU_FREQ_MHZ 50
 #endif
 
 #define ITERATIONS COREMARK_ITERATIONS
