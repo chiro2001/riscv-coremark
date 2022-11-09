@@ -177,6 +177,7 @@ void portable_init(core_portable *p, int *argc, char *argv[]) {
 */
 void portable_fini(core_portable *p) { p->portable_id = 0; }
 
+#if(MULTITHREAD>1)
 ee_u8 core_start_parallel(core_results *res) {
   printf("core_start_parallel!\n");
   // write res address
@@ -194,3 +195,4 @@ ee_u8 core_stop_parallel(core_results *res) {
   } while (flag == 0);
   return flag;
 }
+#endif

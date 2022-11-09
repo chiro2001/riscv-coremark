@@ -60,11 +60,13 @@ void *iterate(void *pres) {
     res->crc = crcu16(crc, res->crc);
     if (i == 0) res->crclist = res->crc;
   }
+#if(MULTITHREAD>1)
   if (((core_results *)pres)->hart_id != 0) {
     ee_u32 hart_id = ((core_results *)pres)->hart_id;
     *(ee_u32 *)(SMP_FINISH_FLAG + hart_id * 4) = 1;
     for(;;);
   }
+#endif
   return NULL;
 }
 
@@ -133,12 +135,12 @@ coremark_main(int argc, char *argv[]) {
   results[0].seed2 = 0;
   results[0].seed3 = 0x66;
   results[0].iterations = get_seed_32(4);
-  ee_printf("init seed: %d, %d, %d, %d, %d\n", results[0].seed1, results[0].seed2, results[0].seed3, results[0].size, seedcrc);
+  // ee_printf("init seed: %d, %d, %d, %d, %d\n", results[0].seed1, results[0].seed2, results[0].seed3, results[0].size, seedcrc);
 #if CORE_DEBUG
   results[0].iterations = 1;
 #endif
   if (results[0].iterations == 0) printf("iteration need inititaion!\n");
-  else printf("iteration = %d, MULTITHREAD = %d\n", results[0].iterations, MULTITHREAD);
+  // else printf("iteration = %d, MULTITHREAD = %d\n", results[0].iterations, MULTITHREAD);
   results[0].execs = get_seed_32(5);
   if (results[0].execs == 0) { /* if not supplied, execute all algorithms */
     results[0].execs = ALL_ALGORITHMS_MASK;
@@ -156,13 +158,15 @@ coremark_main(int argc, char *argv[]) {
     results[0].seed2 = 0x3415;
     results[0].seed3 = 0x66;
   }
-  ee_printf("line %d: %d, %d, %d, %d, %d\n", __LINE__, results[0].seed1, results[0].seed2, results[0].seed3, results[0].size, seedcrc);
+  // ee_printf("line %d: %d, %d, %d, %d, %d\n", __LINE__, results[0].seed1, results[0].seed2, results[0].seed3, results[0].size, seedcrc);
 #if (MEM_METHOD == MEM_STATIC)
   results[0].memblock[0] = (void *)static_memblk;
   results[0].size = TOTAL_DATA_SIZE;
   results[0].err = 0;
   
+#if(MULTITHREAD>1)
   results[0].hart_id=0;
+#endif
 
 #if (MULTITHREAD > 1)
   for (i = 1; i < MULTITHREAD; i++) {
@@ -175,7 +179,7 @@ coremark_main(int argc, char *argv[]) {
     results[i].execs = results[0].execs;
     results[i].hart_id = i;
   }
-  ee_printf("STATIC %d: %d, %d, %d, %d, %d\n", __LINE__, results[0].seed1, results[0].seed2, results[0].seed3, results[0].size, seedcrc);
+  // ee_printf("STATIC %d: %d, %d, %d, %d, %d\n", __LINE__, results[0].seed1, results[0].seed2, results[0].seed3, results[0].size, seedcrc);
 #endif
 #elif (MEM_METHOD == MEM_MALLOC)
   for (i = 0; i < MULTITHREAD; i++) {
@@ -241,7 +245,7 @@ for (i = 0; i < MULTITHREAD; i++) {
                       results[i].memblock[3]);
     }
   }
-  printf("inits done\n");
+  // printf("inits done\n");
 
   /* automatically determine number of iterations if not set */
   if (results[0].iterations == 0) {
@@ -279,7 +283,7 @@ for (i = 0; i < MULTITHREAD; i++) {
   iterate(&results[0]);
 
   for (i = 1; i < default_num_contexts; i++) {
-    printf("stoping cpu %d\n", i);
+    // printf("stoping cpu %d\n", i);
     core_stop_parallel(&results[i]);
   }
 #else
@@ -287,7 +291,7 @@ for (i = 0; i < MULTITHREAD; i++) {
 #endif
   stop_time();
   total_time = get_time();
-  ee_printf("%d, %d, %d, %d, %d\n", results[0].seed1, results[0].seed2, results[0].seed3, results[0].size, seedcrc);
+  // ee_printf("%d, %d, %d, %d, %d\n", results[0].seed1, results[0].seed2, results[0].seed3, results[0].size, seedcrc);
   /* get a function of the input to report */
   seedcrc = crc16(results[0].seed1, seedcrc);
   seedcrc = crc16(results[0].seed2, seedcrc);
